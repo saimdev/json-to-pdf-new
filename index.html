@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON to PDF Converter</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+            --hover-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .main-container {
+            padding: 2rem 0;
+        }
+
+        .converter-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .converter-panel:hover {
+            box-shadow: var(--hover-shadow);
+        }
+
+        .panel-header {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .panel-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .panel-header h1 {
+            font-size: 2.5rem;
+            font-weight: 300;
+            margin: 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        .panel-header p {
+            margin: 0.5rem 0 0;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        .upload-zone {
+            border: 2px dashed #dee2e6;
+            border-radius: 15px;
+            padding: 3rem 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            background: linear-gradient(45deg, #f8f9fa, #ffffff);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .upload-zone::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(transparent, rgba(102, 126, 234, 0.1), transparent);
+            animation: rotate 6s linear infinite;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .upload-zone:hover::before {
+            opacity: 1;
+        }
+
+        @keyframes rotate {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .upload-zone.dragover {
+            border-color: #667eea;
+            background: linear-gradient(45deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+            transform: scale(1.02);
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            color: #667eea;
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .file-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .file-item {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-left: 4px solid #667eea;
+            transition: all 0.3s ease;
+        }
+
+        .file-item:hover {
+            background: #e9ecef;
+            transform: translateX(5px);
+        }
+
+        .settings-card {
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(5px);
+        }
+
+        .form-control,
+        .form-select {
+            border-radius: 10px;
+            border: 1px solid #dee2e6;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+
+        .btn-primary {
+            background: var(--primary-gradient);
+            border: none;
+            border-radius: 10px;
+            padding: 0.75rem 2rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-success {
+            background: var(--success-gradient);
+            border: none;
+            border-radius: 10px;
+        }
+
+        .btn-danger {
+            background: var(--secondary-gradient);
+            border: none;
+            border-radius: 10px;
+        }
+
+        .progress-container {
+            margin-top: 1rem;
+        }
+
+        .progress {
+            height: 8px;
+            border-radius: 10px;
+            background: #e9ecef;
+        }
+
+        .progress-bar {
+            background: var(--success-gradient);
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+
+        .alert {
+            border: none;
+            border-radius: 10px;
+            border-left: 4px solid;
+        }
+
+        .alert-success {
+            background: rgba(79, 172, 254, 0.1);
+            border-left-color: #4facfe;
+            color: #0056b3;
+        }
+
+        .alert-danger {
+            background: rgba(245, 87, 108, 0.1);
+            border-left-color: #f5576c;
+            color: #dc3545;
+        }
+
+        .section-title {
+            color: #667eea;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .advanced-options {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
+            border-radius: 15px;
+            padding: 1.5rem;
+            border: 1px solid rgba(102, 126, 234, 0.1);
+        }
+
+        .color-picker {
+            width: 50px;
+            height: 35px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            .panel-header h1 {
+                font-size: 2rem;
+            }
+
+            .upload-zone {
+                padding: 2rem 1rem;
+            }
+
+            .upload-icon {
+                font-size: 2rem;
+            }
+        }
+
+        .loading-spinner {
+            display: none;
+            width: 2rem;
+            height: 2rem;
+        }
+
+        .status-badge {
+            font-size: 0.8rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container main-container">
+        <div class="converter-panel">
+            <!-- Header -->
+            <div class="panel-header">
+                <h1><i class="fas fa-file-code me-3"></i>JSON to PDF Converter</h1>
+                <p>Transform your JSON data into beautiful PDF documents</p>
+            </div>
+
+            <div class="p-4">
+                <!-- Upload Section -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="upload-zone" id="uploadZone">
+                            <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                            <h4>Drop JSON files here or click to browse</h4>
+                            <p class="text-muted">Supports single or multiple JSON files</p>
+                            <input type="file" id="fileInput" class="file-input" accept=".json" multiple>
+                            <button type="button" class="btn btn-primary mt-3"
+                                onclick="document.getElementById('fileInput').click()">
+                                <i class="fas fa-folder-open me-2"></i>Select Files
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- File List -->
+                <div class="row mb-4" id="fileListContainer" style="display: none;">
+                    <div class="col-12">
+                        <div class="settings-card p-3">
+                            <h5 class="section-title">
+                                <i class="fas fa-list"></i>
+                                Selected Files
+                            </h5>
+                            <div id="fileList" class="file-list"></div>
+                            <button type="button" class="btn btn-outline-danger btn-sm mt-2" onclick="clearFiles()">
+                                <i class="fas fa-trash me-1"></i>Clear All
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Settings Section -->
+                <div class="row mb-4">
+                    <div class="col-lg-6 mb-3">
+                        <div class="settings-card p-3 h-100">
+                            <h5 class="section-title">
+                                <i class="fas fa-cog"></i>
+                                PDF Settings
+                            </h5>
+
+                            <div class="mb-3">
+                                <label class="form-label">Page Format</label>
+                                <select class="form-select" id="pageFormat">
+                                    <option value="a4">A4</option>
+                                    <option value="a3">A3</option>
+                                    <option value="a5">A5</option>
+                                    <option value="letter">Letter</option>
+                                    <option value="legal">Legal</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Orientation</label>
+                                <select class="form-select" id="orientation">
+                                    <option value="portrait">Portrait</option>
+                                    <option value="landscape">Landscape</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Output Format</label>
+                                <select class="form-select" id="outputFormat">
+                                    <option value="single">Single PDF (if multiple files)</option>
+                                    <option value="separate">Separate PDFs (ZIP archive)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6 mb-3">
+                        <div class="settings-card p-3 h-100">
+                            <h5 class="section-title">
+                                <i class="fas fa-palette"></i>
+                                Styling Options
+                            </h5>
+
+                            <div class="mb-3">
+                                <label class="form-label">Font Size</label>
+                                <input type="range" class="form-range" id="fontSize" min="8" max="20" value="12">
+                                <small class="text-muted">Current: <span id="fontSizeValue">12</span>px</small>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-6">
+                                    <label class="form-label">Header Color</label>
+                                    <input type="color" class="form-control color-picker" id="headerColor"
+                                        value="#667eea">
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label">Text Color</label>
+                                    <input type="color" class="form-control color-picker" id="textColor"
+                                        value="#333333">
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Font Family</label>
+                                <select class="form-select" id="fontFamily">
+                                    <option value="helvetica">Helvetica</option>
+                                    <option value="times">Times</option>
+                                    <option value="courier">Courier</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Advanced Options -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="advanced-options">
+                            <h5 class="section-title">
+                                <i class="fas fa-tools"></i>
+                                Advanced Options
+                            </h5>
+
+                            <div class="row">
+                                <div class="col-lg-4 mb-3">
+                                    <label class="form-label">Custom Title</label>
+                                    <input type="text" class="form-control" id="customTitle"
+                                        placeholder="Enter document title">
+                                </div>
+
+                                <div class="col-lg-4 mb-3">
+                                    <label class="form-label">Author</label>
+                                    <input type="text" class="form-control" id="author" placeholder="Document author">
+                                </div>
+
+                                <div class="col-lg-4 mb-3">
+                                    <label class="form-label">Subject</label>
+                                    <input type="text" class="form-control" id="subject" placeholder="Document subject">
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-lg-3 mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="includeTimestamp" checked>
+                                        <label class="form-check-label" for="includeTimestamp">
+                                            Include Timestamp
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-3 mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="prettyPrint" checked>
+                                        <label class="form-check-label" for="prettyPrint">
+                                            Pretty Print JSON
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-3 mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="addPageNumbers" checked>
+                                        <label class="form-check-label" for="addPageNumbers">
+                                            Page Numbers
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-3 mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="addBorder">
+                                        <label class="form-check-label" for="addBorder">
+                                            Page Border
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Convert Button -->
+                <div class="row mb-4">
+                    <div class="col-12 text-center">
+                        <button type="button" class="btn btn-primary btn-lg" id="convertBtn" onclick="convertFiles()">
+                            <i class="fas fa-magic me-2"></i>Convert to PDF
+                            <div class="spinner-border loading-spinner ms-2" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Progress Bar -->
+                <div class="progress-container" id="progressContainer" style="display: none;">
+                    <div class="progress">
+                        <div class="progress-bar" role="progressbar" id="progressBar" style="width: 0%"></div>
+                    </div>
+                    <small class="text-muted mt-1 d-block">Processing files...</small>
+                </div>
+
+                <!-- Alert Messages -->
+                <div id="alertContainer"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let selectedFiles = [];
+
+        // Initialize event listeners
+        document.addEventListener('DOMContentLoaded', function () {
+            const uploadZone = document.getElementById('uploadZone');
+            const fileInput = document.getElementById('fileInput');
+            const fontSizeSlider = document.getElementById('fontSize');
+            const fontSizeValue = document.getElementById('fontSizeValue');
+
+            // Upload zone events
+            uploadZone.addEventListener('click', () => fileInput.click());
+            uploadZone.addEventListener('dragover', handleDragOver);
+            uploadZone.addEventListener('dragleave', handleDragLeave);
+            uploadZone.addEventListener('drop', handleDrop);
+
+            fileInput.addEventListener('change', handleFileSelect);
+            fontSizeSlider.addEventListener('input', (e) => {
+                fontSizeValue.textContent = e.target.value;
+            });
+        });
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.currentTarget.classList.add('dragover');
+        }
+
+        function handleDragLeave(e) {
+            e.currentTarget.classList.remove('dragover');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('dragover');
+            const files = Array.from(e.dataTransfer.files).filter(file =>
+                file.type === 'application/json' || file.name.endsWith('.json')
+            );
+            addFiles(files);
+        }
+
+        function handleFileSelect(e) {
+            const files = Array.from(e.target.files);
+            addFiles(files);
+        }
+
+        function addFiles(files) {
+            files.forEach(file => {
+                if (!selectedFiles.find(f => f.name === file.name)) {
+                    selectedFiles.push(file);
+                }
+            });
+            updateFileList();
+            showAlert('Files added successfully!', 'success');
+        }
+
+        function updateFileList() {
+            const fileList = document.getElementById('fileList');
+            const fileListContainer = document.getElementById('fileListContainer');
+
+            if (selectedFiles.length === 0) {
+                fileListContainer.style.display = 'none';
+                return;
+            }
+
+            fileListContainer.style.display = 'block';
+            fileList.innerHTML = '';
+
+            selectedFiles.forEach((file, index) => {
+                const fileItem = document.createElement('div');
+                fileItem.className = 'file-item';
+                fileItem.innerHTML = `
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-file-code text-primary me-2"></i>
+                        <span>${file.name}</span>
+                        <span class="status-badge bg-success text-white ms-2">Ready</span>
+                    </div>
+                    <div>
+                        <small class="text-muted me-2">${formatFileSize(file.size)}</small>
+                        <button class="btn btn-sm btn-outline-danger" onclick="removeFile(${index})">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                `;
+                fileList.appendChild(fileItem);
+            });
+        }
+
+        function removeFile(index) {
+            selectedFiles.splice(index, 1);
+            updateFileList();
+        }
+
+        function clearFiles() {
+            selectedFiles = [];
+            updateFileList();
+            document.getElementById('fileInput').value = '';
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        async function convertFiles() {
+            if (selectedFiles.length === 0) {
+                showAlert('Please select at least one JSON file.', 'danger');
+                return;
+            }
+
+            const convertBtn = document.getElementById('convertBtn');
+            const loadingSpinner = convertBtn.querySelector('.loading-spinner');
+            const progressContainer = document.getElementById('progressContainer');
+            const progressBar = document.getElementById('progressBar');
+
+            // Disable button and show loading
+            convertBtn.disabled = true;
+            loadingSpinner.style.display = 'inline-block';
+            progressContainer.style.display = 'block';
+
+            try {
+                const settings = getSettings();
+                const outputFormat = document.getElementById('outputFormat').value;
+
+                if (selectedFiles.length === 1 || outputFormat === 'single') {
+                    // Single PDF
+                    const pdf = await createSinglePDF(selectedFiles, settings);
+                    const filename = settings.customTitle || 'converted-json';
+                    pdf.save(`${filename}.pdf`);
+                    showAlert('PDF generated successfully!', 'success');
+                } else {
+                    // Multiple PDFs in ZIP
+                    const zip = new JSZip();
+
+                    for (let i = 0; i < selectedFiles.length; i++) {
+                        const file = selectedFiles[i];
+                        const progress = ((i + 1) / selectedFiles.length) * 100;
+                        updateProgress(progress);
+
+                        const pdf = await createPDFFromFile(file, settings);
+                        const filename = file.name.replace('.json', '.pdf');
+                        const pdfBlob = pdf.output('blob');
+                        zip.file(filename, pdfBlob);
+                    }
+
+                    const zipBlob = await zip.generateAsync({ type: 'blob' });
+                    const downloadLink = document.createElement('a');
+                    downloadLink.href = URL.createObjectURL(zipBlob);
+                    downloadLink.download = 'converted-pdfs.zip';
+                    downloadLink.click();
+
+                    showAlert('ZIP file with PDFs generated successfully!', 'success');
+                }
+
+            } catch (error) {
+                console.error('Conversion error:', error);
+                showAlert('Error converting files: ' + error.message, 'danger');
+            } finally {
+                // Re-enable button and hide loading
+                convertBtn.disabled = false;
+                loadingSpinner.style.display = 'none';
+                progressContainer.style.display = 'none';
+                updateProgress(0);
+            }
+        }
+
+        function getSettings() {
+            return {
+                pageFormat: document.getElementById('pageFormat').value,
+                orientation: document.getElementById('orientation').value,
+                fontSize: parseInt(document.getElementById('fontSize').value),
+                headerColor: document.getElementById('headerColor').value,
+                textColor: document.getElementById('textColor').value,
+                fontFamily: document.getElementById('fontFamily').value,
+                customTitle: document.getElementById('customTitle').value,
+                author: document.getElementById('author').value,
+                subject: document.getElementById('subject').value,
+                includeTimestamp: document.getElementById('includeTimestamp').checked,
+                prettyPrint: document.getElementById('prettyPrint').checked,
+                addPageNumbers: document.getElementById('addPageNumbers').checked,
+                addBorder: document.getElementById('addBorder').checked
+            };
+        }
+
+        async function createSinglePDF(files, settings) {
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF({
+                orientation: settings.orientation,
+                unit: 'mm',
+                format: settings.pageFormat
+            });
+
+            // Set metadata
+            pdf.setProperties({
+                title: settings.customTitle || 'JSON to PDF Conversion',
+                author: settings.author || 'JSON to PDF Converter',
+                subject: settings.subject || 'Converted JSON Data',
+                creator: 'JSON to PDF Converter'
+            });
+
+            let isFirstPage = true;
+
+            for (const file of files) {
+                if (!isFirstPage) {
+                    pdf.addPage();
+                }
+
+                const jsonData = await readFileAsText(file);
+                const parsedData = JSON.parse(jsonData);
+                const formattedJson = settings.prettyPrint ?
+                    JSON.stringify(parsedData, null, 2) :
+                    JSON.stringify(parsedData);
+
+                addContentToPDF(pdf, file.name, formattedJson, settings);
+                isFirstPage = false;
+            }
+
+            return pdf;
+        }
+
+        async function createPDFFromFile(file, settings) {
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF({
+                orientation: settings.orientation,
+                unit: 'mm',
+                format: settings.pageFormat
+            });
+
+            // Set metadata
+            pdf.setProperties({
+                title: settings.customTitle || file.name,
+                author: settings.author || 'JSON to PDF Converter',
+                subject: settings.subject || 'Converted JSON Data',
+                creator: 'JSON to PDF Converter'
+            });
+
+            const jsonData = await readFileAsText(file);
+            const parsedData = JSON.parse(jsonData);
+            const formattedJson = settings.prettyPrint ?
+                JSON.stringify(parsedData, null, 2) :
+                JSON.stringify(parsedData);
+
+            addContentToPDF(pdf, file.name, formattedJson, settings);
+
+            return pdf;
+        }
+
+        function addContentToPDF(pdf, filename, jsonContent, settings) {
+            const pageWidth = pdf.internal.pageSize.getWidth();
+            const pageHeight = pdf.internal.pageSize.getHeight();
+            const margin = 20;
+            const lineHeight = settings.fontSize * 0.35;
+            let yPosition = margin;
+
+            // Add border if enabled
+            if (settings.addBorder) {
+                pdf.setDrawColor(settings.headerColor);
+                pdf.setLineWidth(0.5);
+                pdf.rect(5, 5, pageWidth - 10, pageHeight - 10);
+            }
+
+            // Title
+            pdf.setFontSize(settings.fontSize + 4);
+            pdf.setTextColor(settings.headerColor);
+            pdf.setFont(settings.fontFamily, 'bold');
+            const title = settings.customTitle || filename;
+            pdf.text(title, margin, yPosition);
+            yPosition += lineHeight + 5;
+
+            // Timestamp if enabled
+            if (settings.includeTimestamp) {
+                pdf.setFontSize(settings.fontSize - 2);
+                pdf.setTextColor('#666666');
+                pdf.setFont(settings.fontFamily, 'normal');
+                const timestamp = new Date().toLocaleString();
+                pdf.text(`Generated: ${timestamp}`, margin, yPosition);
+                yPosition += lineHeight + 5;
+            }
+
+            // Separator line
+            pdf.setDrawColor(settings.headerColor);
+            pdf.line(margin, yPosition, pageWidth - margin, yPosition);
+            yPosition += 10;
+
+            // JSON Content
+            pdf.setFontSize(settings.fontSize);
+            pdf.setTextColor(settings.textColor);
+            pdf.setFont(settings.fontFamily, 'normal');
+
+            const lines = jsonContent.split('\n');
+            const maxWidth = pageWidth - (2 * margin);
+
+            lines.forEach(line => {
+                if (yPosition > pageHeight - 30) {
+                    pdf.addPage();
+                    yPosition = margin;
+
+                    // Add border to new page if enabled
+                    if (settings.addBorder) {
+                        pdf.setDrawColor(settings.headerColor);
+                        pdf.setLineWidth(0.5);
+                        pdf.rect(5, 5, pageWidth - 10, pageHeight - 10);
+                    }
+                }
+
+                const splitLines = pdf.splitTextToSize(line || ' ', maxWidth);
+                splitLines.forEach(splitLine => {
+                    if (yPosition > pageHeight - 30) {
+                        pdf.addPage();
+                        yPosition = margin;
+
+                        // Add border to new page if enabled
+                        if (settings.addBorder) {
+                            pdf.setDrawColor(settings.headerColor);
+                            pdf.setLineWidth(0.5);
+                            pdf.rect(5, 5, pageWidth - 10, pageHeight - 10);
+                        }
+                    }
+                    pdf.text(splitLine, margin, yPosition);
+                    yPosition += lineHeight;
+                });
+            });
+
+            // Add page numbers if enabled
+            if (settings.addPageNumbers) {
+                const totalPages = pdf.internal.getNumberOfPages();
+                for (let i = 1; i <= totalPages; i++) {
+                    pdf.setPage(i);
+                    pdf.setFontSize(10);
+                    pdf.setTextColor('#666666');
+                    pdf.text(`Page ${i} of ${totalPages}`, pageWidth - 40, pageHeight - 10);
+                }
+            }
+        }
+
+        function readFileAsText(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = e => resolve(e.target.result);
+                reader.onerror = reject;
+                reader.readAsText(file);
+            });
+        }
+
+        function updateProgress(percentage) {
+            const progressBar = document.getElementById('progressBar');
+            progressBar.style.width = percentage + '%';
+            progressBar.setAttribute('aria-valuenow', percentage);
+        }
+
+        function showAlert(message, type) {
+            const alertContainer = document.getElementById('alertContainer');
+            const alertId = 'alert-' + Date.now();
+
+            const alertDiv = document.createElement('div');
+            alertDiv.id = alertId;
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+            alertDiv.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-triangle'} me-2"></i>
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+
+            alertContainer.appendChild(alertDiv);
+
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                const alert = document.getElementById(alertId);
+                if (alert) {
+                    alert.remove();
+                }
+            }, 5000);
+        }
+
+        // Preset configurations
+        function applyPreset(preset) {
+            switch (preset) {
+                case 'minimal':
+                    document.getElementById('fontSize').value = 10;
+                    document.getElementById('fontFamily').value = 'helvetica';
+                    document.getElementById('headerColor').value = '#000000';
+                    document.getElementById('textColor').value = '#333333';
+                    document.getElementById('addBorder').checked = false;
+                    document.getElementById('prettyPrint').checked = false;
+                    break;
+                case 'colorful':
+                    document.getElementById('fontSize').value = 12;
+                    document.getElementById('fontFamily').value = 'helvetica';
+                    document.getElementById('headerColor').value = '#667eea';
+                    document.getElementById('textColor').value = '#444444';
+                    document.getElementById('addBorder').checked = true;
+                    document.getElementById('prettyPrint').checked = true;
+                    break;
+                case 'professional':
+                    document.getElementById('fontSize').value = 11;
+                    document.getElementById('fontFamily').value = 'times';
+                    document.getElementById('headerColor').value = '#2c3e50';
+                    document.getElementById('textColor').value = '#2c3e50';
+                    document.getElementById('addBorder').checked = true;
+                    document.getElementById('prettyPrint').checked = true;
+                    break;
+            }
+            document.getElementById('fontSizeValue').textContent = document.getElementById('fontSize').value;
+        }
+
+        // Add preset buttons after page load
+        document.addEventListener('DOMContentLoaded', function () {
+            const advancedOptions = document.querySelector('.advanced-options');
+            const presetSection = document.createElement('div');
+            presetSection.className = 'row mt-3 pt-3 border-top';
+            presetSection.innerHTML = `
+                <div class="col-12">
+                    <h6 class="text-muted mb-2">Quick Presets:</h6>
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="applyPreset('minimal')">
+                            <i class="fas fa-minimize me-1"></i>Minimal
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="applyPreset('colorful')">
+                            <i class="fas fa-palette me-1"></i>Colorful
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="applyPreset('professional')">
+                            <i class="fas fa-briefcase me-1"></i>Professional
+                        </button>
+                    </div>
+                </div>
+            `;
+            advancedOptions.appendChild(presetSection);
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function (e) {
+            if (e.ctrlKey || e.metaKey) {
+                switch (e.key) {
+                    case 'o':
+                        e.preventDefault();
+                        document.getElementById('fileInput').click();
+                        break;
+                    case 'Enter':
+                        e.preventDefault();
+                        if (selectedFiles.length > 0) {
+                            convertFiles();
+                        }
+                        break;
+                    case 'Delete':
+                        e.preventDefault();
+                        clearFiles();
+                        break;
+                }
+            }
+        });
+
+        // Auto-save settings to localStorage
+        function saveSettings() {
+            const settings = getSettings();
+            localStorage.setItem('json-pdf-converter-settings', JSON.stringify(settings));
+        }
+
+        function loadSettings() {
+            const saved = localStorage.getItem('json-pdf-converter-settings');
+            if (saved) {
+                const settings = JSON.parse(saved);
+                Object.keys(settings).forEach(key => {
+                    const element = document.getElementById(key);
+                    if (element) {
+                        if (element.type === 'checkbox') {
+                            element.checked = settings[key];
+                        } else {
+                            element.value = settings[key];
+                        }
+                    }
+                });
+                document.getElementById('fontSizeValue').textContent = settings.fontSize || 12;
+            }
+        }
+
+        // Save settings when they change
+        document.addEventListener('DOMContentLoaded', function () {
+            loadSettings();
+
+            const settingsElements = [
+                'pageFormat', 'orientation', 'fontSize', 'headerColor', 'textColor',
+                'fontFamily', 'customTitle', 'author', 'subject', 'includeTimestamp',
+                'prettyPrint', 'addPageNumbers', 'addBorder', 'outputFormat'
+            ];
+
+            settingsElements.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.addEventListener('change', saveSettings);
+                    element.addEventListener('input', saveSettings);
+                }
+            });
+        });
+
+        // Add sample JSON functionality
+        function loadSampleJSON() {
+            const sampleData = {
+                "user": {
+                    "id": 12345,
+                    "name": "John Doe",
+                    "email": "john.doe@example.com",
+                    "profile": {
+                        "age": 30,
+                        "location": "New York, NY",
+                        "interests": ["technology", "reading", "travel"]
+                    }
+                },
+                "orders": [
+                    {
+                        "orderId": "ORD-001",
+                        "date": "2025-09-15",
+                        "items": [
+                            { "name": "Laptop", "price": 999.99, "quantity": 1 },
+                            { "name": "Mouse", "price": 29.99, "quantity": 2 }
+                        ],
+                        "total": 1059.97
+                    }
+                ],
+                "metadata": {
+                    "version": "1.0",
+                    "generated": new Date().toISOString(),
+                    "source": "sample-generator"
+                }
+            };
+
+            const blob = new Blob([JSON.stringify(sampleData, null, 2)], { type: 'application/json' });
+            const file = new File([blob], 'sample-data.json', { type: 'application/json' });
+            addFiles([file]);
+        }
+    </script>
+</body>
+
+</html>

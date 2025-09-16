@@ -1,0 +1,74 @@
+{
+    "company": {
+        "name": "TechNova Solutions",
+        "id": "TECH-2025-001",
+        "founded": "2018-03-15",
+        "headquarters": {
+            "address": "1250 Innovation Drive",
+            "city": "San Francisco",
+            "state": "California",
+            "zipCode": "94105",
+            "country": "United States",
+            "coordinates": {
+                "latitude": 37.7749,
+                "longitude": -122.4194
+            }
+        },
+        "employees": 247,
+        "revenue": {
+            "2023": 15750000,
+            "2024": 21300000,
+            "projected_2025": 28900000,
+            "currency": "USD"
+        },
+        "departments": [
+            {
+                "name": "Engineering",
+                "head": "Sarah Chen",
+                "employees": 89,
+                "budget": 8500000,
+                "teams": [
+                    "Frontend",
+                    "Backend",
+                    "DevOps",
+                    "Mobile",
+                    "AI/ML"
+                ]
+            },
+            {
+                "name": "Product Management",
+                "head": "Michael Rodriguez",
+                "employees": 23,
+                "budget": 2100000,
+                "teams": [
+                    "Product Strategy",
+                    "UX Research",
+                    "Data Analytics"
+                ]
+            },
+            {
+                "name": "Sales & Marketing",
+                "head": "Jessica Williams",
+                "employees": 67,
+                "budget": 4200000,
+                "teams": [
+                    "Enterprise Sales",
+                    "Digital Marketing",
+                    "Customer Success"
+                ]
+            },
+            {
+                "name": "Operations",
+                "head": "David Kim",
+                "employees": 45,
+                "budget": 3800000,
+                "teams": [
+                    "HR",
+                    "Finance",
+                    "Legal",
+                    "IT Support"
+                ]
+            }
+        ]
+    }
+}

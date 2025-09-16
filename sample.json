@@ -1,0 +1,306 @@
+{
+    "company": {
+      "name": "TechNova Solutions",
+      "id": "TECH-2025-001",
+      "founded": "2018-03-15",
+      "headquarters": {
+        "address": "1250 Innovation Drive",
+        "city": "San Francisco",
+        "state": "California",
+        "zipCode": "94105",
+        "country": "United States",
+        "coordinates": {
+          "latitude": 37.7749,
+          "longitude": -122.4194
+        }
+      },
+      "employees": 247,
+      "revenue": {
+        "2023": 15750000,
+        "2024": 21300000,
+        "projected_2025": 28900000,
+        "currency": "USD"
+      },
+      "departments": [
+        {
+          "name": "Engineering",
+          "head": "Sarah Chen",
+          "employees": 89,
+          "budget": 8500000,
+          "teams": ["Frontend", "Backend", "DevOps", "Mobile", "AI/ML"]
+        },
+        {
+          "name": "Product Management",
+          "head": "Michael Rodriguez",
+          "employees": 23,
+          "budget": 2100000,
+          "teams": ["Product Strategy", "UX Research", "Data Analytics"]
+        },
+        {
+          "name": "Sales & Marketing",
+          "head": "Jessica Williams",
+          "employees": 67,
+          "budget": 4200000,
+          "teams": ["Enterprise Sales", "Digital Marketing", "Customer Success"]
+        },
+        {
+          "name": "Operations",
+          "head": "David Kim",
+          "employees": 45,
+          "budget": 3800000,
+          "teams": ["HR", "Finance", "Legal", "IT Support"]
+        }
+      ]
+    },
+    "products": [
+      {
+        "id": "PROD-001",
+        "name": "CloudSync Pro",
+        "category": "Cloud Storage",
+        "version": "3.2.1",
+        "released": "2024-11-15T08:30:00Z",
+        "price": {
+          "basic": 9.99,
+          "professional": 29.99,
+          "enterprise": 99.99,
+          "billing": "monthly"
+        },
+        "features": [
+          "Real-time synchronization",
+          "End-to-end encryption",
+          "Team collaboration",
+          "API access",
+          "Advanced analytics"
+        ],
+        "supported_platforms": ["Windows", "macOS", "Linux", "iOS", "Android"],
+        "active_users": 125000,
+        "user_rating": 4.7,
+        "last_updated": "2025-01-15T14:22:33Z"
+      },
+      {
+        "id": "PROD-002",
+        "name": "DataViz Studio",
+        "category": "Business Intelligence",
+        "version": "2.8.0",
+        "released": "2024-08-22T16:45:00Z",
+        "price": {
+          "starter": 19.99,
+          "business": 59.99,
+          "enterprise": 199.99,
+          "billing": "monthly"
+        },
+        "features": [
+          "Interactive dashboards",
+          "Custom chart types",
+          "Real-time data streaming",
+          "Export capabilities",
+          "White-label solutions"
+        ],
+        "supported_platforms": ["Web", "Windows", "macOS"],
+        "active_users": 78000,
+        "user_rating": 4.5,
+        "last_updated": "2025-01-10T09:15:22Z"
+      }
+    ],
+    "customers": [
+      {
+        "id": "CUST-12001",
+        "company_name": "Global Manufacturing Corp",
+        "contact_person": {
+          "name": "Robert Thompson",
+          "title": "CTO",
+          "email": "r.thompson@globalmanuf.com",
+          "phone": "+1-555-0123"
+        },
+        "subscription": {
+          "product": "CloudSync Pro",
+          "plan": "enterprise",
+          "start_date": "2023-06-01",
+          "renewal_date": "2025-06-01",
+          "monthly_cost": 2999.99,
+          "users": 500
+        },
+        "location": {
+          "country": "United States",
+          "region": "North America",
+          "timezone": "America/New_York"
+        },
+        "satisfaction_score": 8.9,
+        "support_tickets": {
+          "total": 23,
+          "resolved": 21,
+          "pending": 2,
+          "avg_resolution_time": "4.2 hours"
+        }
+      },
+      {
+        "id": "CUST-12002",
+        "company_name": "European Analytics Ltd",
+        "contact_person": {
+          "name": "Marie Dubois",
+          "title": "Data Director",
+          "email": "m.dubois@euroanalytics.eu",
+          "phone": "+33-1-23-45-67-89"
+        },
+        "subscription": {
+          "product": "DataViz Studio",
+          "plan": "business",
+          "start_date": "2024-02-15",
+          "renewal_date": "2025-02-15",
+          "monthly_cost": 1199.99,
+          "users": 75
+        },
+        "location": {
+          "country": "France",
+          "region": "Europe",
+          "timezone": "Europe/Paris"
+        },
+        "satisfaction_score": 9.2,
+        "support_tickets": {
+          "total": 8,
+          "resolved": 8,
+          "pending": 0,
+          "avg_resolution_time": "2.8 hours"
+        }
+      }
+    ],
+    "financial_data": {
+      "quarterly_results": {
+        "Q1_2024": {
+          "revenue": 5200000,
+          "expenses": 3800000,
+          "profit": 1400000,
+          "growth_rate": 0.23
+        },
+        "Q2_2024": {
+          "revenue": 5850000,
+          "expenses": 4100000,
+          "profit": 1750000,
+          "growth_rate": 0.18
+        },
+        "Q3_2024": {
+          "revenue": 6100000,
+          "expenses": 4350000,
+          "profit": 1750000,
+          "growth_rate": 0.15
+        },
+        "Q4_2024": {
+          "revenue": 6750000,
+          "expenses": 4850000,
+          "profit": 1900000,
+          "growth_rate": 0.12
+        }
+      },
+      "expenses_breakdown": {
+        "salaries": 12500000,
+        "benefits": 2800000,
+        "office_rent": 1200000,
+        "technology": 980000,
+        "marketing": 1850000,
+        "travel": 320000,
+        "legal": 180000,
+        "utilities": 95000,
+        "other": 225000
+      },
+      "funding_rounds": [
+        {
+          "round": "Seed",
+          "date": "2018-05-20",
+          "amount": 2000000,
+          "investors": ["Angel Ventures", "Tech Accelerator Fund"]
+        },
+        {
+          "round": "Series A",
+          "date": "2020-09-10",
+          "amount": 8500000,
+          "investors": ["Growth Capital Partners", "Innovation Ventures", "Strategic Tech Fund"]
+        },
+        {
+          "round": "Series B",
+          "date": "2023-03-15",
+          "amount": 25000000,
+          "investors": ["Enterprise Capital", "Digital Transformation Fund", "Future Tech Ventures"]
+        }
+      ]
+    },
+    "technology_stack": {
+      "frontend": {
+        "frameworks": ["React", "Vue.js", "Angular"],
+        "languages": ["JavaScript", "TypeScript", "HTML", "CSS"],
+        "tools": ["Webpack", "Vite", "ESLint", "Prettier"]
+      },
+      "backend": {
+        "languages": ["Python", "Node.js", "Go", "Java"],
+        "frameworks": ["Django", "Express.js", "Gin", "Spring Boot"],
+        "databases": ["PostgreSQL", "MongoDB", "Redis", "Elasticsearch"]
+      },
+      "infrastructure": {
+        "cloud_provider": "AWS",
+        "services": ["EC2", "S3", "RDS", "Lambda", "CloudFront", "Route53"],
+        "containerization": ["Docker", "Kubernetes"],
+        "monitoring": ["Prometheus", "Grafana", "New Relic"],
+        "ci_cd": ["GitHub Actions", "Jenkins", "ArgoCD"]
+      },
+      "security": {
+        "authentication": ["OAuth 2.0", "JWT", "SAML"],
+        "encryption": ["AES-256", "RSA-2048", "TLS 1.3"],
+        "compliance": ["SOC 2", "GDPR", "HIPAA", "PCI DSS"]
+      }
+    },
+    "metrics": {
+      "performance": {
+        "api_response_time": {
+          "average": "245ms",
+          "p95": "890ms",
+          "p99": "1.2s"
+        },
+        "uptime": {
+          "current_month": 99.97,
+          "last_12_months": 99.94,
+          "target": 99.9
+        },
+        "throughput": {
+          "requests_per_second": 15420,
+          "peak_rps": 28750,
+          "daily_requests": 1250000000
+        }
+      },
+      "user_engagement": {
+        "daily_active_users": 45200,
+        "monthly_active_users": 203000,
+        "average_session_duration": "23.5 minutes",
+        "feature_adoption": {
+          "real_time_sync": 0.89,
+          "team_collaboration": 0.67,
+          "api_usage": 0.34,
+          "advanced_analytics": 0.23
+        }
+      }
+    },
+    "compliance_certifications": [
+      {
+        "name": "ISO 27001",
+        "issued_date": "2023-08-15",
+        "expiry_date": "2026-08-15",
+        "certifying_body": "BSI Group"
+      },
+      {
+        "name": "SOC 2 Type II",
+        "issued_date": "2024-01-30",
+        "expiry_date": "2025-01-30",
+        "certifying_body": "Deloitte & Touche LLP"
+      }
+    ],
+    "metadata": {
+      "file_version": "1.2.3",
+      "generated_by": "TechNova Data Export Tool",
+      "generated_at": "2025-09-17T14:30:45.123Z",
+      "format_version": "2024.1",
+      "data_classification": "internal",
+      "retention_period": "7 years",
+      "last_modified_by": "system.automation@technova.com",
+      "checksum": "a1b2c3d4e5f6789012345678901234567890abcd",
+      "file_size_bytes": 8426,
+      "encoding": "UTF-8"
+    }
+  }
